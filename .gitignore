@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment variables — NEVER commit real secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.test
+
+# Prisma local
+prisma/*.db
+prisma/*.db-journal
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Local file storage (dev adapter)
+uploads/
+storage/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Test / coverage
+coverage/
+.vitest/
