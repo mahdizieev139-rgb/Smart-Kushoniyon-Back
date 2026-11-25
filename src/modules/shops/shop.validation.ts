@@ -17,6 +17,8 @@ export const createShopSchema = z.object({
     .regex(/^\+?[0-9]{7,15}$/, 'Invalid phone number')
     .optional(),
   sectionId: z.string().uuid().optional(),
+  // v2: physical stall number for market navigation.
+  shopNumber: z.string().trim().max(50).optional(),
   slug: z.string().trim().min(1).max(150).optional(),
 });
 
@@ -28,6 +30,7 @@ export const updateShopSchema = z.object({
     .regex(/^\+?[0-9]{7,15}$/)
     .optional(),
   sectionId: z.string().uuid().nullable().optional(),
+  shopNumber: z.string().trim().max(50).nullable().optional(),
   slug: z.string().trim().min(1).max(150).optional(),
 });
 

@@ -33,6 +33,8 @@ async function main() {
 
   // 2. A demo ADMIN, SELLER and CUSTOMER so every role can be tested.
   const demoPassword = await hashPassword('Demo1234!');
+  // Single timestamp reused for demo stock updates (keeps the seed tidy).
+  const FIXED_DATE = new Date();
 
   await prisma.user.upsert({
     where: { email: 'admin@kushoniyon.local' },
@@ -78,6 +80,7 @@ async function main() {
     update: {},
     create: {
       code: 'demo-gate-1',
+      isDemo: true,
       translations: { create: t('DEMO Дарвозаи 1', 'DEMO Ворота 1', 'DEMO Gate 1') },
     },
   });
@@ -88,6 +91,8 @@ async function main() {
     create: {
       code: 'demo-section-a',
       gateId: gate.id,
+      isDemo: true,
+      rowNumber: 'A',
       translations: {
         create: [
           { locale: 'tj', name: 'DEMO Қатори А', description: null },
@@ -107,6 +112,8 @@ async function main() {
       phone: '+992900000000',
       status: 'APPROVED',
       sectionId: section.id,
+      isDemo: true,
+      shopNumber: 'A-12',
       translations: {
         create: [
           { locale: 'tj', name: 'DEMO Мағозаи Соҳибкор', description: 'Намунаи мағоза' },
@@ -118,9 +125,32 @@ async function main() {
     },
   });
 
+  // A SECOND demo shop so price comparison has cross-shop data to show.
+  const shop2 = await prisma.shop.upsert({
+    where: { slug: 'demo-shop-barakat' },
+    update: {},
+    create: {
+      slug: 'demo-shop-barakat',
+      phone: '+992900000001',
+      status: 'APPROVED',
+      sectionId: section.id,
+      isDemo: true,
+      shopNumber: 'A-15',
+      translations: {
+        create: [
+          { locale: 'tj', name: 'DEMO Мағозаи Баракат', description: 'Намунаи мағоза' },
+          { locale: 'ru', name: 'DEMO Магазин Баракат', description: 'Демо-магазин' },
+          { locale: 'en', name: 'DEMO Barakat Shop', description: 'Demo shop' },
+        ],
+      },
+      members: { create: { userId: seller.id, role: 'OWNER' } },
+    },
+  });
+
   // 6. Two demo products in that shop.
   const existingProducts = await prisma.product.count({ where: { shopId: shop.id } });
   if (existingProducts === 0) {
+    // Approved white tile in shop 1 (brand + attributes let comparison match it).
     await prisma.product.create({
       data: {
         shopId: shop.id,
@@ -129,6 +159,11 @@ async function main() {
         currency: 'TJS',
         status: 'APPROVED',
         availability: 'IN_STOCK',
+        stockQuantity: 120,
+        stockUnit: 'm2',
+        lastStockUpdate: FIXED_DATE,
+        brand: 'DEMO Kafel',
+        attributes: { size: '60x60', material: 'ceramic', color: 'white' },
         translations: {
           create: [
             { locale: 'tj', name: 'DEMO Кошини сафед', description: 'Кошини девор' },
@@ -146,12 +181,41 @@ async function main() {
         price: '62.00',
         currency: 'TJS',
         status: 'PENDING',
-        availability: 'IN_STOCK',
+        availability: 'LIMITED_STOCK',
+        stockQuantity: 8,
+        stockUnit: 'm2',
+        lastStockUpdate: FIXED_DATE,
+        brand: 'DEMO Kafel',
         translations: {
           create: [
             { locale: 'tj', name: 'DEMO Кошини хокистарӣ', description: null },
             { locale: 'ru', name: 'DEMO Серая плитка', description: null },
             { locale: 'en', name: 'DEMO Grey tile', description: null },
+          ],
+        },
+      },
+    });
+
+    // Comparable approved white tile in shop 2 — cheaper, same brand + size, so
+    // GET /products/:id/compare returns a real cross-shop match.
+    await prisma.product.create({
+      data: {
+        shopId: shop2.id,
+        categoryId: tilesCategory?.id ?? null,
+        price: '42.00',
+        currency: 'TJS',
+        status: 'APPROVED',
+        availability: 'IN_STOCK',
+        stockQuantity: 60,
+        stockUnit: 'm2',
+        lastStockUpdate: FIXED_DATE,
+        brand: 'DEMO Kafel',
+        attributes: { size: '60x60', material: 'ceramic', color: 'white' },
+        translations: {
+          create: [
+            { locale: 'tj', name: 'DEMO Кошини сафед', description: 'Кошини девор' },
+            { locale: 'ru', name: 'DEMO Белая плитка', description: 'Настенная плитка' },
+            { locale: 'en', name: 'DEMO White tile', description: 'Wall tile' },
           ],
         },
       },

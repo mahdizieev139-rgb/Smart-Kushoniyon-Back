@@ -17,6 +17,9 @@ import searchRouter from '../modules/search/search.routes';
 import advertisementRouter from '../modules/advertisements/advertisement.routes';
 import adminRouter from '../modules/admin/admin.routes';
 import sellerRouter from '../modules/seller/seller.routes';
+import favoriteRouter from '../modules/favorites/favorite.routes';
+import notificationRouter from '../modules/notifications/notification.routes';
+import inquiryRouter from '../modules/inquiries/inquiry.routes';
 
 export const apiRouter = Router();
 
@@ -35,7 +38,10 @@ apiRouter.use('/sections', sectionRouter);
 apiRouter.use('/market-map', marketMapRouter);
 apiRouter.use('/search', searchRouter);
 apiRouter.use('/advertisements', advertisementRouter);
+apiRouter.use('/favorites', favoriteRouter);
+apiRouter.use('/notifications', notificationRouter);
+apiRouter.use('/inquiries', inquiryRouter);
 apiRouter.use('/seller', sellerRouter);
 // Admin aggregator groups /admin/shops, /admin/products, /admin/analytics,
-// /admin/subscriptions, /admin/settings, /admin/audit-logs, etc.
+// /admin/settings, /admin/audit-logs, etc.
 apiRouter.use('/admin', adminRouter);

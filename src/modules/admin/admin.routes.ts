@@ -20,20 +20,12 @@ import * as shopController from '../shops/shop.controller';
 import * as productController from '../products/product.controller';
 import * as analyticsController from '../analytics/analytics.controller';
 import * as userController from '../users/user.controller';
-import * as subscriptionController from '../subscriptions/subscription.controller';
 import * as settingController from '../settings/setting.controller';
 import * as auditLogController from '../audit-logs/audit-log.controller';
 
 import { listShopsQuerySchema, idParamSchema as shopIdParam, rejectSchema as shopReject } from '../shops/shop.validation';
 import { listProductsQuerySchema, idParamSchema as productIdParam, rejectSchema as productReject } from '../products/product.validation';
 import { listUsersQuerySchema, updateUserSchema, createAdminSchema, idParamSchema as userIdParam } from '../users/user.validation';
-import {
-  createSubscriptionSchema,
-  updateSubscriptionSchema,
-  listSubscriptionsQuerySchema,
-  recordInvoiceSchema,
-  idParamSchema as subIdParam,
-} from '../subscriptions/subscription.validation';
 import { upsertSettingSchema, keyParamSchema } from '../settings/setting.validation';
 
 const router = Router();
@@ -66,14 +58,9 @@ router.patch('/users/:id', adminOrSuper, validate({ params: userIdParam, body: u
 // Creating admin accounts is SUPER_ADMIN only.
 router.post('/users', superOnly, validate({ body: createAdminSchema }), asyncHandler(userController.createAdmin));
 
-// ---- Subscriptions (SUPER_ADMIN) ----
-router.get('/subscription-plans', adminOrSuper, asyncHandler(subscriptionController.listPlans));
-router.put('/subscription-plans', superOnly, asyncHandler(subscriptionController.updatePlans));
-router.get('/subscriptions', superOnly, validate({ query: listSubscriptionsQuerySchema }), asyncHandler(subscriptionController.list));
-router.get('/subscriptions/:id', superOnly, validate({ params: subIdParam }), asyncHandler(subscriptionController.getById));
-router.post('/subscriptions', superOnly, validate({ body: createSubscriptionSchema }), asyncHandler(subscriptionController.create));
-router.patch('/subscriptions/:id', superOnly, validate({ params: subIdParam, body: updateSubscriptionSchema }), asyncHandler(subscriptionController.update));
-router.patch('/subscriptions/:id/invoice', superOnly, validate({ params: subIdParam, body: recordInvoiceSchema }), asyncHandler(subscriptionController.recordInvoice));
+// NOTE: Subscription routes were intentionally unmounted in v2 (monetization
+// is out of scope). The Subscription/SubscriptionInvoice tables are KEPT so no
+// data is lost; the module code was removed. Re-mount here if ever needed.
 
 // ---- System settings (SUPER_ADMIN) ----
 router.get('/settings', superOnly, asyncHandler(settingController.list));

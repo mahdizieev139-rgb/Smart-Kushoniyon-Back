@@ -51,3 +51,32 @@ export async function createUserWithRole(role: UserRole): Promise<TestUser> {
 export function auth(token: string) {
   return { Authorization: `Bearer ${token}` };
 }
+
+// Create a seller, an approved shop, and (optionally) an approved product.
+// Returns the ids + tokens used across the v2 feature tests.
+export async function sellerWithApprovedShop(name = 'Shop') {
+  const seller = await registerUser('SELLER');
+  const admin = await createUserWithRole('ADMIN');
+  const shopRes = await api
+    .post(`${API}/shops`)
+    .set(auth(seller.accessToken))
+    .send({ translations: [{ locale: 'tj', name }] });
+  const shopId = shopRes.body.data.id;
+  await api.patch(`${API}/admin/shops/${shopId}/approve`).set(auth(admin.accessToken));
+  return { seller, admin, shopId };
+}
+
+export async function createApprovedProduct(
+  token: string,
+  adminToken: string,
+  shopId: string,
+  body: Record<string, unknown> = {},
+) {
+  const res = await api
+    .post(`${API}/products`)
+    .set(auth(token))
+    .send({ shopId, price: 50, translations: [{ locale: 'tj', name: 'Item' }], ...body });
+  const productId = res.body.data.id;
+  await api.patch(`${API}/admin/products/${productId}/approve`).set(auth(adminToken));
+  return productId;
+}

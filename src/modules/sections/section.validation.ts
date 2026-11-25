@@ -11,22 +11,31 @@ const translationSchema = z.object({
 
 const latitude = z.coerce.number().min(-90).max(90);
 const longitude = z.coerce.number().min(-180).max(180);
+const relativePos = z.coerce.number().min(0).max(1);
 
 export const createSectionSchema = z.object({
   gateId: z.string().uuid('A valid gateId is required'),
   code: z.string().trim().min(1).max(50),
+  rowNumber: z.string().trim().max(50).optional(),
   translations: z.array(translationSchema).min(1),
   latitude: latitude.optional(),
   longitude: longitude.optional(),
+  posX: relativePos.optional(),
+  posY: relativePos.optional(),
+  isDemo: z.coerce.boolean().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 });
 
 export const updateSectionSchema = z.object({
   gateId: z.string().uuid().optional(),
   code: z.string().trim().min(1).max(50).optional(),
+  rowNumber: z.string().trim().max(50).nullable().optional(),
   translations: z.array(translationSchema).min(1).optional(),
   latitude: latitude.nullable().optional(),
   longitude: longitude.nullable().optional(),
+  posX: relativePos.nullable().optional(),
+  posY: relativePos.nullable().optional(),
+  isDemo: z.coerce.boolean().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 });
 

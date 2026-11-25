@@ -27,6 +27,8 @@ function present(shop: ShopWithTranslations, locale: Locale) {
     phone: shop.phone,
     status: shop.status,
     sectionId: shop.sectionId,
+    shopNumber: shop.shopNumber,
+    isDemo: shop.isDemo,
     createdAt: shop.createdAt,
     updatedAt: shop.updatedAt,
     ...resolveTranslations(shop.translations, locale),
@@ -113,6 +115,7 @@ async function create(input: CreateShopInput, owner: { id: string }) {
         slug,
         phone: input.phone ?? null,
         sectionId: input.sectionId ?? null,
+        shopNumber: input.shopNumber ?? null,
         status: 'PENDING', // sellers always start pending
         translations: {
           create: input.translations.map((t) => ({
@@ -153,6 +156,7 @@ async function update(id: string, input: UpdateShopInput, actor: { id: string; r
         ...(input.slug ? { slug: input.slug } : {}),
         ...(input.phone !== undefined ? { phone: input.phone } : {}),
         ...(input.sectionId !== undefined ? { sectionId: input.sectionId } : {}),
+        ...(input.shopNumber !== undefined ? { shopNumber: input.shopNumber } : {}),
       },
     });
 

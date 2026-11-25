@@ -14,12 +14,17 @@ const nameTranslationSchema = z.object({
 // Latitude/longitude ranges validated so bad coordinates are rejected.
 const latitude = z.coerce.number().min(-90).max(90);
 const longitude = z.coerce.number().min(-180).max(180);
+// v2 schematic (indoor) position — relative 0..1 coordinates on a floor-plan.
+const relativePos = z.coerce.number().min(0).max(1);
 
 export const createGateSchema = z.object({
   code: z.string().trim().min(1).max(50),
   translations: z.array(nameTranslationSchema).min(1),
   latitude: latitude.optional(),
   longitude: longitude.optional(),
+  posX: relativePos.optional(),
+  posY: relativePos.optional(),
+  isDemo: z.coerce.boolean().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 });
 
@@ -28,6 +33,9 @@ export const updateGateSchema = z.object({
   translations: z.array(nameTranslationSchema).min(1).optional(),
   latitude: latitude.nullable().optional(),
   longitude: longitude.nullable().optional(),
+  posX: relativePos.nullable().optional(),
+  posY: relativePos.nullable().optional(),
+  isDemo: z.coerce.boolean().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 });
 

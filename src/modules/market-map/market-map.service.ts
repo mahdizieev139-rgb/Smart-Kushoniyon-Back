@@ -36,14 +36,23 @@ async function getMap(locale: Locale = 'tj') {
   return gates.map((gate) => ({
     id: gate.id,
     code: gate.code,
+    // Real GPS (may be null until verified).
     latitude: gate.latitude ? Number(gate.latitude) : null,
     longitude: gate.longitude ? Number(gate.longitude) : null,
+    // Schematic (indoor floor-plan) position, 0..1 relative coordinates.
+    posX: gate.posX ? Number(gate.posX) : null,
+    posY: gate.posY ? Number(gate.posY) : null,
+    isDemo: gate.isDemo,
     name: resolveTranslations(gate.translations, locale).name,
     sections: gate.sections.map((section) => ({
       id: section.id,
       code: section.code,
+      rowNumber: section.rowNumber,
       latitude: section.latitude ? Number(section.latitude) : null,
       longitude: section.longitude ? Number(section.longitude) : null,
+      posX: section.posX ? Number(section.posX) : null,
+      posY: section.posY ? Number(section.posY) : null,
+      isDemo: section.isDemo,
       ...resolveTranslations(section.translations, locale),
       shopCount: section._count.shops,
     })),

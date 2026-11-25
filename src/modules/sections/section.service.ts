@@ -17,8 +17,12 @@ function present(section: SectionFull, locale: Locale) {
     id: section.id,
     gateId: section.gateId,
     code: section.code,
+    rowNumber: section.rowNumber,
     latitude: section.latitude ? Number(section.latitude) : null,
     longitude: section.longitude ? Number(section.longitude) : null,
+    posX: section.posX ? Number(section.posX) : null,
+    posY: section.posY ? Number(section.posY) : null,
+    isDemo: section.isDemo,
     status: section.status,
     createdAt: section.createdAt,
     updatedAt: section.updatedAt,
@@ -70,6 +74,8 @@ async function getShops(sectionId: string, locale: Locale = 'tj') {
     slug: shop.slug,
     phone: shop.phone,
     status: shop.status,
+    shopNumber: shop.shopNumber,
+    isDemo: shop.isDemo,
     ...resolveTranslations(shop.translations, locale),
   }));
 }
@@ -82,8 +88,12 @@ async function create(input: CreateSectionInput) {
     data: {
       gateId: input.gateId,
       code: input.code,
+      rowNumber: input.rowNumber ?? null,
       latitude: input.latitude ?? null,
       longitude: input.longitude ?? null,
+      posX: input.posX ?? null,
+      posY: input.posY ?? null,
+      isDemo: input.isDemo ?? false,
       status: input.status ?? 'ACTIVE',
       translations: {
         create: input.translations.map((t) => ({
@@ -108,8 +118,12 @@ async function update(id: string, input: UpdateSectionInput) {
       data: {
         ...(input.gateId ? { gateId: input.gateId } : {}),
         ...(input.code ? { code: input.code } : {}),
+        ...(input.rowNumber !== undefined ? { rowNumber: input.rowNumber } : {}),
         ...(input.latitude !== undefined ? { latitude: input.latitude } : {}),
         ...(input.longitude !== undefined ? { longitude: input.longitude } : {}),
+        ...(input.posX !== undefined ? { posX: input.posX } : {}),
+        ...(input.posY !== undefined ? { posY: input.posY } : {}),
+        ...(input.isDemo !== undefined ? { isDemo: input.isDemo } : {}),
         ...(input.status ? { status: input.status } : {}),
       },
     });

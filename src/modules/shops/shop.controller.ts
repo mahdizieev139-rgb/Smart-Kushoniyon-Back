@@ -5,6 +5,7 @@
  */
 import type { Request, Response } from 'express';
 import { shopService } from './shop.service';
+import { viewTrackingService } from '../analytics/view-tracking.service';
 import { sendSuccess, sendCreated } from '../../utils/api-response';
 import { parseLocale } from '../../utils/localization';
 import { ApiError } from '../../utils/api-error';
@@ -17,12 +18,21 @@ export async function listPublic(req: Request, res: Response) {
 
 export async function getById(req: Request, res: Response) {
   const shop = await shopService.getById(req.params.id, parseLocale(req.query.locale), req.user);
+  await recordShopViewIfPublic(req, shop.id, shop.status);
   return sendSuccess(res, shop, 'Shop');
 }
 
 export async function getBySlug(req: Request, res: Response) {
   const shop = await shopService.getBySlug(req.params.slug, parseLocale(req.query.locale), req.user);
+  await recordShopViewIfPublic(req, shop.id, shop.status);
   return sendSuccess(res, shop, 'Shop');
+}
+
+// v2: record a deduped, PII-free view for approved (public) shops only.
+async function recordShopViewIfPublic(req: Request, shopId: string, status: string) {
+  if (status !== 'APPROVED') return;
+  const viewerKey = viewTrackingService.buildViewerKey(req.user?.id, req.ip);
+  await viewTrackingService.recordShopView(shopId, viewerKey);
 }
 
 // --- Seller (owner) ---

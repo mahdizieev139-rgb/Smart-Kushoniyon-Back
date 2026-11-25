@@ -24,6 +24,11 @@ router.use(authenticate, authorize('SELLER', 'ADMIN', 'SUPER_ADMIN'));
 // Seller dashboard — aggregate stats for the seller's own shops.
 router.get('/dashboard', asyncHandler(analyticsController.sellerOverview));
 
+// v2: richer analytics (views + highlights). Scoped to the seller's own shops.
+router.get('/analytics', asyncHandler(analyticsController.sellerAnalytics));
+router.get('/analytics/products', asyncHandler(analyticsController.sellerProductAnalytics));
+router.get('/analytics/shops', asyncHandler(analyticsController.sellerShopAnalytics));
+
 // The seller's own shops and products.
 router.get('/shops', validate({ query: listShopsQuerySchema }), asyncHandler(shopController.listMine));
 router.get('/products', validate({ query: listProductsQuerySchema }), asyncHandler(productController.listMine));

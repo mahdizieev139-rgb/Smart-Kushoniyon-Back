@@ -17,6 +17,7 @@ import { asyncHandler } from '../../utils/async-handler';
 import {
   createProductSchema,
   updateProductSchema,
+  updateStockSchema,
   listProductsQuerySchema,
   idParamSchema,
 } from './product.validation';
@@ -25,6 +26,9 @@ const router = Router();
 
 // ---- Public reads ----
 router.get('/', validate({ query: listProductsQuerySchema }), asyncHandler(productController.listPublic));
+// v2: public price comparison + price history (declared before /:id catch-all).
+router.get('/:id/compare', validate({ params: idParamSchema }), asyncHandler(productController.compare));
+router.get('/:id/price-history', validate({ params: idParamSchema }), asyncHandler(productController.priceHistory));
 router.get(
   '/:id',
   optionalAuthenticate,
@@ -53,6 +57,14 @@ router.delete(
   authorize('SELLER', 'ADMIN', 'SUPER_ADMIN'),
   validate({ params: idParamSchema }),
   asyncHandler(productController.remove),
+);
+// v2: dedicated stock/availability update (seller + admins).
+router.patch(
+  '/:id/stock',
+  authenticate,
+  authorize('SELLER', 'ADMIN', 'SUPER_ADMIN'),
+  validate({ params: idParamSchema, body: updateStockSchema }),
+  asyncHandler(productController.updateStock),
 );
 
 // ---- Nested image routes: /products/:id/images ----
